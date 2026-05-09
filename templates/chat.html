@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Chat</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="topbar">
+    <h2>AI Chat Agent</h2>
+
+    <div>
+        <span>
+            {{ user.name }} |
+            Messages: {{ user.message_count }}/{{ limit }}
+        </span>
+
+        <a href="/settings">Settings</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div id="chat-box"></div>
+
+<div class="chat-input">
+    <input type="text" id="message" placeholder="Type your message...">
+
+    <button onclick="sendMessage()">
+        Send
+    </button>
+</div>
+
+<script src="/static/chat.js"></script>
+
+</body>
+</html>
