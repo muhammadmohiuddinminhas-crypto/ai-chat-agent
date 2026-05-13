@@ -1,0 +1,208 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:Arial, sans-serif;
+    background:#0f172a;
+    color:white;
+    height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.container{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.card{
+    background:#1e293b;
+    padding:40px;
+    border-radius:15px;
+    width:400px;
+    text-align:center;
+
+    box-shadow:0 0 25px rgba(0,0,0,0.5);
+}
+
+.card h1{
+    margin-bottom:15px;
+    font-size:32px;
+}
+
+.card p{
+    margin-bottom:30px;
+    color:#cbd5e1;
+}
+
+.login-btn{
+    display:inline-block;
+    width:100%;
+    padding:14px;
+
+    background:#2563eb;
+    color:white;
+
+    text-decoration:none;
+    border-radius:8px;
+
+    font-size:18px;
+    transition:0.3s;
+}
+
+.login-btn:hover{
+    background:#1d4ed8;
+}
+
+.topbar{
+    width:100%;
+    padding:15px 30px;
+    background:#111827;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    position:fixed;
+    top:0;
+    left:0;
+}
+
+.topbar a{
+    color:white;
+    margin-left:15px;
+    text-decoration:none;
+}
+
+#chat-box{
+    width:80%;
+    max-width:800px;
+    height:70vh;
+
+    background:#1e293b;
+
+    margin-top:90px;
+    padding:20px;
+
+    overflow-y:auto;
+
+    border-radius:10px;
+}
+
+.user-msg{
+    background:#2563eb;
+    padding:12px;
+    margin:10px 0;
+    border-radius:10px;
+
+    text-align:right;
+}
+
+.bot-msg{
+    background:#334155;
+    padding:12px;
+    margin:10px 0;
+    border-radius:10px;
+
+    text-align:left;
+}
+
+.chat-input{
+    position:fixed;
+    bottom:20px;
+
+    width:80%;
+    max-width:800px;
+
+    display:flex;
+    gap:10px;
+}
+
+.chat-input input{
+    flex:1;
+    padding:14px;
+
+    border:none;
+    border-radius:8px;
+
+    font-size:16px;
+}
+
+.chat-input button{
+    padding:14px 20px;
+
+    border:none;
+    border-radius:8px;
+
+    background:#2563eb;
+    color:white;
+
+    cursor:pointer;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+
+    border:none;
+    border-radius:8px;
+
+    font-size:16px;
+}
+
+button{
+    border:none;
+    cursor:pointer;
+}
+
+form h2{
+    margin-top:20px;
+    margin-bottom:10px;
+
+    text-align:left;
+}
+
+ul{
+    text-align:left;
+    margin-top:20px;
+    margin-bottom:20px;
+    padding-left:20px;
+}
+
+ul li{
+    margin-bottom:10px;
+}
+
+@media(max-width:768px){
+
+    .card{
+        width:90%;
+        padding:25px;
+    }
+
+    #chat-box{
+        width:95%;
+    }
+
+    .chat-input{
+        width:95%;
+    }
+
+    .topbar{
+        flex-direction:column;
+        gap:10px;
+        text-align:center;
+    }
+}
