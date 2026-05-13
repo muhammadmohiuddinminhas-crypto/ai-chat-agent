@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Settings</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <form method="POST" class="card">
+
+        <h1>Integration Settings</h1>
+
+        <h2>WhatsApp Integration</h2>
+
+        <input
+            type="text"
+            name="whatsapp_number"
+            placeholder="WhatsApp Number"
+            value="{{ integration.whatsapp_number if integration else '' }}"
+        >
+
+        <input
+            type="text"
+            name="whatsapp_api_key"
+            placeholder="WhatsApp API Key"
+            value="{{ integration.whatsapp_api_key if integration else '' }}"
+        >
+
+        <h2>E-commerce Integration</h2>
+
+        <input
+            type="text"
+            name="store_type"
+            placeholder="Store Type"
+            value="{{ integration.store_type if integration else '' }}"
+        >
+
+        <input
+            type="text"
+            name="store_url"
+            placeholder="Store URL"
+            value="{{ integration.store_url if integration else '' }}"
+        >
+
+        <input
+            type="text"
+            name="store_api_key"
+            placeholder="Store API Key"
+            value="{{ integration.store_api_key if integration else '' }}"
+        >
+
+        <button type="submit" class="login-btn">
+            Save Settings
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>
