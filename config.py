@@ -13,5 +13,5 @@ class Config:
     GPT_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
     GOOGLE_OAUTH_CLIENT_ID = os.getenv("865453545088-rh4i9e3mi5lu31jg74061f3gtf20gj0r.apps.googleusercontent.com")
-    GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("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")
+    GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("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")
 
