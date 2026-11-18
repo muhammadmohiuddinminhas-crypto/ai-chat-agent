@@ -91,10 +91,11 @@ class Integration(db.Model):
     )
 
     user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("user.id"),
-        nullable=False
-    )
+    db.Integer,
+    db.ForeignKey("user.id"),
+    nullable=False
+)
+    
 
     # WhatsApp Integration
     whatsapp_number = db.Column(
@@ -116,4 +117,62 @@ class Integration(db.Model):
 
     store_api_key = db.Column(
         db.String(300)
+    )
+
+
+
+# =========================
+# WHATSAPP CONVERSATION MODEL
+# =========================
+
+class WhatsAppConversation(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    sender_id = db.Column(
+        db.String(100),
+        nullable=False,
+        index=True
+    )
+
+    user_message = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    bot_response = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+
+# =========================
+# PROCESSED WHATSAPP MESSAGES
+# =========================
+
+class WhatsAppProcessedMessage(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    # Meta's unique WhatsApp message ID
+    message_id = db.Column(
+        db.String(200),
+        unique=True,
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
     )

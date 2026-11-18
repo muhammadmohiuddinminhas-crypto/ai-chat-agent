@@ -1,5 +1,6 @@
 import os
 import requests
+from sqlalchemy.exc import IntegrityError
 
 from flask import (
     Flask,
@@ -24,7 +25,14 @@ from datetime import datetime, date
 import os
 
 from config import Config
-from database import db, User, Conversation, Integration
+from database import (
+    db,
+    User,
+    Conversation,
+    Integration,
+    WhatsAppConversation,
+    WhatsAppProcessedMessage
+)
 from auth import google_bp
 from ai import generate_response
 
@@ -499,6 +507,7 @@ def send_whatsapp_message(recipient, message):
     return response.json()
 
 
+
 # ==========================================
 # WHATSAPP WEBHOOK
 # ==========================================
@@ -542,6 +551,11 @@ def whatsapp_webhook():
 
                 for incoming in messages:
 
+                    message_id = incoming.get("id")
+
+                    if not message_id:
+                        continue
+
                     sender = incoming.get("from")
                     message_type = incoming.get("type")
 
@@ -556,6 +570,23 @@ def whatsapp_webhook():
                     if not user_message:
                         continue
 
+                    # Atomically register the WhatsApp message ID
+                    try:
+                        db.session.add(
+                            WhatsAppProcessedMessage(
+                                message_id=message_id
+                            )
+                        )
+                        db.session.commit()
+
+                    except IntegrityError:
+                        db.session.rollback()
+
+                        app.logger.info(
+                            "Duplicate WhatsApp message ignored."
+                        )
+                        continue
+
                     app.logger.info(
                         "Incoming WhatsApp text message received."
                     )
@@ -568,6 +599,16 @@ def whatsapp_webhook():
                             "AI returned an empty response."
                         )
 
+                    # Save WhatsApp conversation
+                    conversation = WhatsAppConversation(
+                        sender_id=sender,
+                        user_message=user_message,
+                        bot_response=ai_reply
+                    )
+
+                    db.session.add(conversation)
+                    db.session.commit()
+
                     # Send AI response to WhatsApp
                     send_whatsapp_message(
                         sender,
@@ -578,12 +619,13 @@ def whatsapp_webhook():
 
     except Exception:
 
+        db.session.rollback()
+
         app.logger.exception(
             "WhatsApp message processing failed."
         )
 
         return "EVENT_RECEIVED", 200
-
 
 # ==========================================
 # APPLICATION START
