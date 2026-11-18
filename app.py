@@ -122,6 +122,14 @@ def data_deletion():
     return render_template("data-deletion.html")
 
 # ==========================================
+# TERMS OF SERVICE PAGE
+# ==========================================
+
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
+
+# ==========================================
 # HOME / LOGIN PAGE
 # ==========================================
 
