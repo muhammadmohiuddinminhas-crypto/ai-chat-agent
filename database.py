@@ -2,34 +2,118 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
 
-
 db = SQLAlchemy()
 
 
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    google_id = db.Column(db.String(200), unique=True)
-    email = db.Column(db.String(200), unique=True)
-    name = db.Column(db.String(200))
-    message_count = db.Column(db.Integer, default=0)
-    last_reset = db.Column(db.DateTime, default=datetime.utcnow)
+# =========================
+# USER MODEL
+# =========================
 
+class User(UserMixin, db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    google_id = db.Column(
+        db.String(200),
+        unique=True,
+        nullable=False
+    )
+
+    email = db.Column(
+        db.String(200),
+        unique=True,
+        nullable=False
+    )
+
+    name = db.Column(
+        db.String(200),
+        nullable=False
+    )
+
+    # Daily message counter
+    message_count = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    # Date/time when message count was last reset
+    last_reset = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+
+# =========================
+# CONVERSATION MODEL
+# =========================
 
 class Conversation(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
-    user_message = db.Column(db.Text)
-    bot_reply = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    user_message = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    bot_response = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+
+# =========================
+# INTEGRATION SETTINGS
+# =========================
 
 class Integration(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
 
-    whatsapp_number = db.Column(db.String(100))
-    whatsapp_api_key = db.Column(db.String(300))
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
-    store_type = db.Column(db.String(100))
-    store_url = db.Column(db.String(300))
-    store_api_key = db.Column(db.String(300))
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    # WhatsApp Integration
+    whatsapp_number = db.Column(
+        db.String(100)
+    )
+
+    whatsapp_api_key = db.Column(
+        db.String(300)
+    )
+
+    # E-commerce Integration
+    store_type = db.Column(
+        db.String(100)
+    )
+
+    store_url = db.Column(
+        db.String(300)
+    )
+
+    store_api_key = db.Column(
+        db.String(300)
+    )

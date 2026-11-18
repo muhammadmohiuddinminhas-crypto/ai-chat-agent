@@ -1,36 +1,124 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>AI Chat</title>
-    <link rel="stylesheet" href="/static/style.css">
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AI Chat Agent</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
 </head>
+
+
 <body>
 
+
+<!-- TOP BAR -->
+
 <div class="topbar">
-    <h2>AI Chat Agent</h2>
 
-    <div>
-        <span>
+    <h2>🤖 AI Chat Agent</h2>
+
+
+    <div class="topbar-right">
+
+        <span id="message-counter">
+
             {{ user.name }} |
-            Messages: {{ user.message_count }}/{{ limit }}
-        </span>
 
-        <a href="/settings">Settings</a>
-        <a href="/logout">Logout</a>
+            Messages:
+<span id="message-counter">
+
+    {{ user.name }} |
+
+    Messages:
+
+    <span id="message-count">{{ user.message_count }}</span>
+
+    / {{ limit }}
+
+    |
+    <span id="remaining-messages">
+        {{ limit - user.message_count }} remaining
+    </span>
+
+</span>
+
+
+        <a href="{{ url_for('settings') }}">
+            ⚙ Settings
+        </a>
+
+
+        <a href="{{ url_for('logout') }}">
+            Logout
+        </a>
+
     </div>
+
 </div>
 
-<div id="chat-box"></div>
+
+<!-- CHAT BOX -->
+
+<div id="chat-box">
+
+    <div class="welcome-message">
+
+        <h3>Hello, {{ user.name }}! 👋</h3>
+
+        <p>
+            How can I help you today?
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- INPUT AREA -->
 
 <div class="chat-input">
-    <input type="text" id="message" placeholder="Type your message...">
 
-    <button onclick="sendMessage()">
+    <input
+
+        type="text"
+
+        id="message"
+
+        placeholder="Type your message..."
+
+        autocomplete="off"
+
+    >
+
+
+    <button
+
+        id="send-button"
+
+        onclick="sendMessage()"
+
+    >
+
         Send
+
     </button>
+
 </div>
 
-<script src="/static/chat.js"></script>
+
+<!-- JAVASCRIPT -->
+
+<script src="{{ url_for('static', filename='chat.js') }}"></script>
+
 
 </body>
+
 </html>
