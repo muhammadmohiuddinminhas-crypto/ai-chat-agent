@@ -105,6 +105,25 @@ def reset_daily_messages(user):
 
         db.session.commit()
 
+# ==========================================
+# PRIVACY POLICY PAGE
+# ==========================================
+
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+# ==========================================
+# DATA DELETION INSTRUCTIONS PAGE
+# ==========================================
+
+@app.route("/data-deletion")
+def data_deletion():
+    return render_template("data-deletion.html")
+
+# ==========================================
+# HOME / LOGIN PAGE
+# ==========================================
 
 # ==========================================
 # HOME / LOGIN PAGE
