@@ -168,8 +168,9 @@ class Integration(db.Model):
         db.String(300)
     )
 
-
-
+    store_api_secret = db.Column(
+        db.String(300)
+    )
 
 # =========================
 # WHATSAPP CONVERSATION MODEL

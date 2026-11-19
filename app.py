@@ -342,6 +342,10 @@ def settings():
             "store_api_key"
         )
 
+        store_api_secret = request.form.get(
+            "store_api_secret"
+        )
+
         if not integration:
 
             integration = Integration(
@@ -373,6 +377,9 @@ def settings():
         
         if store_api_key:
             integration.store_api_key = store_api_key
+        if store_api_secret:
+            integration.store_api_secret = store_api_secret          
+
         db.session.commit()
 
         return redirect(url_for("settings"))
@@ -462,16 +469,23 @@ def send_message():
             "message": "You have reached your daily limit of 100 messages."
         }), 403
 
-    # Generate AI response
+        # Generate AI response
     try:
+        integration = Integration.query.filter_by(
+            user_id=current_user.id
+        ).first()
 
-        ai_reply = generate_response(user_message)
+        ai_reply = generate_response(
+            user_message,
+            store_url=integration.store_url if integration else None,
+            consumer_key=integration.store_api_key if integration else None,
+            consumer_secret=integration.store_api_secret if integration else None
+        )
 
         if not ai_reply:
             raise Exception("Empty AI response")
 
     except Exception:
-
         app.logger.exception("AI response generation failed")
 
         return jsonify({
@@ -758,9 +772,14 @@ def whatsapp_webhook():
                         "Incoming WhatsApp text message received."
                     )
 
-                    # Generate AI response
-                    ai_reply = generate_response(user_message)
-
+                                       # Generate AI response
+                    ai_reply = generate_response(
+                        user_message,
+                        store_url=integration.store_url if integration else None,
+                        consumer_key=integration.store_api_key if integration else None,
+                        consumer_secret=integration.store_api_secret if integration else None
+                    )
+                    
                     if not ai_reply:
                         raise RuntimeError(
                             "AI returned an empty response."
