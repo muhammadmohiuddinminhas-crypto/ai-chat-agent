@@ -1,4 +1,4 @@
-
+﻿
 // ==========================================
 // CHAT SESSION MANAGEMENT
 // ==========================================
@@ -164,12 +164,12 @@ function startNewChat() {
 
     chatBox.innerHTML = `
         <div class="welcome-message">
-            <h3>New Conversation 👋</h3>
+            <h3>New Conversation ðŸ‘‹</h3>
             <p>How can I help you today?</p>
         </div>
     `;
 
-    titleElement.textContent = "New Chat";
+    titleElement.textContent = "AI Agent 1.0";
 
     document.querySelectorAll(".history-item").forEach(item => {
         item.classList.remove("active");
@@ -541,3 +541,4 @@ if (menuButton && sidebarOverlay && appLayout) {
 // ==========================================
 
 loadChatHistoryList();
+
