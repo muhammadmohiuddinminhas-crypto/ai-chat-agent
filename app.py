@@ -554,13 +554,11 @@ def send_message():
 # WHATSAPP MESSAGE SENDER
 # ==========================================
 
-
 def send_whatsapp_message(
     recipient,
     message,
     phone_number_id=None
 ):
-
     access_token = os.getenv("WHATSAPP_ACCESS_TOKEN")
 
     phone_number_id = (
@@ -614,60 +612,6 @@ def send_whatsapp_message(
         response.raise_for_status()
 
     return response.json()
-
-
-
-# ==========================================
-# WHATSAPP MESSAGE SENDER
-# ==========================================
-
-def send_whatsapp_message(recipient, message):
-
-    access_token = os.getenv("WHATSAPP_ACCESS_TOKEN")
-    phone_number_id = os.getenv("WHATSAPP_PHONE_NUMBER_ID")
-    api_version = os.getenv("WHATSAPP_API_VERSION", "v27.0")
-
-    if not access_token or not phone_number_id:
-        raise RuntimeError("WhatsApp credentials are missing.")
-
-    url = (
-        f"https://graph.facebook.com/"
-        f"{api_version}/{phone_number_id}/messages"
-    )
-
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json"
-    }
-
-    payload = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": recipient,
-        "type": "text",
-        "text": {
-            "preview_url": False,
-            "body": message[:4000]
-        }
-    }
-
-    response = requests.post(
-        url,
-        headers=headers,
-        json=payload,
-        timeout=30
-    )
-
-    if not response.ok:
-        app.logger.error(
-            "WhatsApp API error: %s",
-            response.text
-        )
-        response.raise_for_status()
-
-    return response.json()
-
-
 
 # ==========================================
 # WHATSAPP WEBHOOK
