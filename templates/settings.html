@@ -1,133 +1,77 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Settings</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Settings | AI Chat Agent</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
-
 </head>
-
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <div class="card settings-card">
+        <div class="card settings-card">
 
-        <h1>⚙ Integration Settings</h1>
+            <h1>&#9881; Integration Settings</h1>
 
+            <form method="POST">
 
-        <form method="POST">
+                <h2>&#128241; WhatsApp Integration</h2>
 
+                <input
+                    type="text"
+                    name="whatsapp_number"
+                    placeholder="WhatsApp Number"
+                    value="{{ integration.whatsapp_number if integration else '' }}"
+                >
 
-            <!-- WHATSAPP -->
+                <input
+                    type="password"
+                    name="whatsapp_api_key"
+                    placeholder="Leave blank to keep existing API key"
+                    autocomplete="new-password"
+                >
 
-            <h2>📱 WhatsApp Integration</h2>
+                <h2>&#128722; E-commerce Integration</h2>
 
+                <input
+                    type="text"
+                    name="store_type"
+                    placeholder="Store Type (Shopify, WooCommerce etc.)"
+                    value="{{ integration.store_type if integration else '' }}"
+                >
 
-            <input
+                <input
+                    type="url"
+                    name="store_url"
+                    placeholder="Store URL"
+                    value="{{ integration.store_url if integration else '' }}"
+                >
 
-                type="text"
+                <input
+                    type="password"
+                    name="store_api_key"
+                    placeholder="Leave blank to keep existing API key"
+                    autocomplete="new-password"
+                >
 
-                name="whatsapp_number"
+                <button type="submit" class="save-btn">
+                    &#128190; Save Settings
+                </button>
 
-                placeholder="WhatsApp Number"
+            </form>
 
-                value="{{ integration.whatsapp_number if integration else '' }}"
+            <a href="{{ url_for('chat') }}" class="back-link">
+                &#8592; Back to Chat
+            </a>
 
-            >
-
-
-            <input
-
-                type="password"
-
-                name="whatsapp_api_key"
-
-                placeholder="WhatsApp API Key"
-
-                value="{{ integration.whatsapp_api_key if integration else '' }}"
-
-            >
-
-
-            <!-- E-COMMERCE -->
-
-            <h2>🛒 E-commerce Integration</h2>
-
-
-            <input
-
-                type="text"
-
-                name="store_type"
-
-                placeholder="Store Type (Shopify, WooCommerce etc.)"
-
-                value="{{ integration.store_type if integration else '' }}"
-
-            >
-
-
-            <input
-
-                type="url"
-
-                name="store_url"
-
-                placeholder="Store URL"
-
-                value="{{ integration.store_url if integration else '' }}"
-
-            >
-
-
-            <input
-
-                type="password"
-
-                name="store_api_key"
-
-                placeholder="Store API Key"
-
-                value="{{ integration.store_api_key if integration else '' }}"
-
-            >
-
-
-            <button type="submit"
-                    class="save-btn">
-
-                💾 Save Settings
-
-            </button>
-
-
-        </form>
-
-
-        <br>
-
-
-        <a href="{{ url_for('chat') }}"
-           class="back-link">
-
-            ← Back to Chat
-
-        </a>
+        </div>
 
     </div>
 
-</div>
-
 </body>
-
 </html>

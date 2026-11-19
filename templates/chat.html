@@ -1,124 +1,151 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>AI Chat Agent</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
-
 </head>
-
 
 <body>
 
+<div class="app-layout">
 
-<!-- TOP BAR -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-<div class="topbar">
+    <aside class="sidebar" id="sidebar">
 
-    <h2>🤖 AI Chat Agent</h2>
+        <div class="sidebar-header">
+            <h2>🤖 AI Chat Agent</h2>
+        </div>
 
+        <button id="new-chat-button"
+                class="new-chat-button"
+                onclick="startNewChat()">
+            + New Chat
+        </button>
 
-    <div class="topbar-right">
+        <div class="history-heading">
+            <h3>Recent Conversations</h3>
+        </div>
 
-        <span id="message-counter">
+        <input
+            type="text"
+            id="history-search"
+            class="history-search"
+            placeholder="Search conversations..."
+        >
 
-            {{ user.name }} |
+        <div id="chat-history-list" class="chat-history-list">
+            <p class="history-loading">Loading conversations...</p>
+        </div>
 
-            Messages:
-<span id="message-counter">
+        <div class="sidebar-footer">
 
-    {{ user.name }} |
+            <div class="user-profile">
+                <div class="profile-avatar">
+                    {{ user.name[:1]|upper }}
+                </div>
 
-    Messages:
+                <div class="profile-details">
+                    <strong>{{ user.name }}</strong>
+                    <span>Free Account</span>
+                </div>
+            </div>
 
-    <span id="message-count">{{ user.message_count }}</span>
+            <a href="{{ url_for('settings') }}">⚙ Settings</a>
 
-    / {{ limit }}
+            <a href="{{ url_for('logout') }}">Logout</a>
 
-    |
-    <span id="remaining-messages">
-        {{ limit - user.message_count }} remaining
-    </span>
+        </div>
 
-</span>
-
-
-        <a href="{{ url_for('settings') }}">
-            ⚙ Settings
-        </a>
-
-
-        <a href="{{ url_for('logout') }}">
-            Logout
-        </a>
-
-    </div>
-
-</div>
-
-
-<!-- CHAT BOX -->
-
-<div id="chat-box">
-
-    <div class="welcome-message">
-
-        <h3>Hello, {{ user.name }}! 👋</h3>
-
-        <p>
-            How can I help you today?
-        </p>
-
-    </div>
-
-</div>
+    </aside>
 
 
-<!-- INPUT AREA -->
+    <!-- MAIN CHAT AREA -->
+    <main class="main-content">
 
-<div class="chat-input">
-
-    <input
-
-        type="text"
-
-        id="message"
-
-        placeholder="Type your message..."
-
-        autocomplete="off"
-
-    >
-
+<header class="chat-header">
 
     <button
-
-        id="send-button"
-
-        onclick="sendMessage()"
-
+        type="button"
+        class="mobile-menu-button"
+        id="mobile-menu-button"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
     >
-
-        Send
-
+        &#9776;
     </button>
+
+    <div class="header-title-group">
+
+        <h2 id="current-chat-title">New Chat</h2>
+
+        <p>Your Personal AI Assistant</p>
+
+    </div>
+
+    <div class="message-usage">
+
+        <span class="usage-label">MESSAGES</span>
+
+        <span class="usage-count">
+            <strong id="message-count">{{ user.message_count }}</strong>
+            <span>/ {{ limit }}</span>
+        </span>
+
+        <span id="remaining-messages">
+            {{ limit - user.message_count }} remaining
+        </span>
+
+    </div>
+
+</header>
+
+        <!-- CHAT MESSAGES -->
+        <section id="chat-box" class="chat-box">
+
+            <div class="welcome-message">
+
+                <h3>Hello, {{ user.name }}! 👋</h3>
+
+                <p>How can I help you today?</p>
+
+            </div>
+
+        </section>
+
+
+        <!-- MESSAGE INPUT -->
+        <footer class="chat-input">
+
+            <input
+                type="text"
+                id="message"
+                placeholder="Message AI Chat Agent..."
+                autocomplete="off"
+            >
+
+            <button
+                id="send-button"
+                onclick="sendMessage()"
+            >
+                Send
+            </button>
+
+        </footer>
+
+    </main>
 
 </div>
 
-
-<!-- JAVASCRIPT -->
 
 <script src="{{ url_for('static', filename='chat.js') }}"></script>
 
-
 </body>
-
 </html>

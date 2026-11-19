@@ -47,6 +47,42 @@ class User(UserMixin, db.Model):
 
 
 # =========================
+# CHAT SESSION MODEL
+# =========================
+
+class ChatSession(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False,
+        index=True
+    )
+
+    title = db.Column(
+        db.String(200),
+        nullable=False,
+        default="New Chat"
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+
+# =========================
 # CONVERSATION MODEL
 # =========================
 
@@ -61,6 +97,13 @@ class Conversation(db.Model):
         db.Integer,
         db.ForeignKey("user.id"),
         nullable=False
+    )
+
+    chat_session_id = db.Column(
+        db.Integer,
+        db.ForeignKey("chat_session.id"),
+        nullable=True,
+        index=True
     )
 
     user_message = db.Column(
@@ -102,6 +145,12 @@ class Integration(db.Model):
         db.String(100)
     )
 
+    whatsapp_phone_number_id = db.Column(
+    db.String(100),
+    nullable=True,
+    unique=True
+)
+
     whatsapp_api_key = db.Column(
         db.String(300)
     )
@@ -121,6 +170,7 @@ class Integration(db.Model):
 
 
 
+
 # =========================
 # WHATSAPP CONVERSATION MODEL
 # =========================
@@ -130,6 +180,14 @@ class WhatsAppConversation(db.Model):
     id = db.Column(
         db.Integer,
         primary_key=True
+    )
+
+    # Business owner of this conversation
+    owner_user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=True,
+        index=True
     )
 
     sender_id = db.Column(
@@ -152,7 +210,6 @@ class WhatsAppConversation(db.Model):
         db.DateTime,
         default=datetime.utcnow
     )
-
 
 # =========================
 # PROCESSED WHATSAPP MESSAGES

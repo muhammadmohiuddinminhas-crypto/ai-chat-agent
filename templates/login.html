@@ -1,44 +1,36 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>AI Chat Login</title>
+    <title>Login | AI Chat Agent</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
-
 </head>
-
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <div class="card">
+        <div class="card">
 
-        <h1>🤖 AI Chat Agent</h1>
+            <h1>&#129302; AI Chat Agent</h1>
 
-        <p>
-            Your intelligent AI assistant powered by GPT-OSS-120B.
-        </p>
+            <p>
+                Your intelligent AI assistant powered by GPT-OSS-120B.
+                Sign in to start your conversation.
+            </p>
 
+            <a class="login-btn" href="{{ url_for('google.login') }}">
+                &#128100; Continue with Google
+            </a>
 
-        <a class="login-btn"
-           href="{{ url_for('google.login') }}">
-
-            🔵 Login with Google
-
-        </a>
+        </div>
 
     </div>
 
-</div>
-
 </body>
-
 </html>

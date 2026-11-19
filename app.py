@@ -28,6 +28,7 @@ from config import Config
 from database import (
     db,
     User,
+    ChatSession,
     Conversation,
     Integration,
     WhatsAppConversation,
@@ -230,6 +231,84 @@ def chat():
 
 
 # ==========================================
+# USER CHAT HISTORY
+# ==========================================
+
+@app.route("/chat_history")
+@login_required
+def chat_history():
+
+    sessions = ChatSession.query.filter_by(
+        user_id=current_user.id
+    ).order_by(
+        ChatSession.updated_at.desc()
+    ).all()
+
+    history = []
+
+    for session in sessions:
+
+        history.append({
+            "id": session.id,
+            "title": session.title,
+            "created_at": session.created_at.strftime(
+                "%Y-%m-%d %H:%M"
+            ),
+            "updated_at": session.updated_at.strftime(
+                "%Y-%m-%d %H:%M"
+            )
+        })
+
+    return jsonify({
+        "history": history
+    })
+
+
+# ==========================================
+# LOAD INDIVIDUAL CHAT SESSION
+# ==========================================
+
+@app.route("/chat_history/<int:session_id>")
+@login_required
+def load_chat_history(session_id):
+
+    chat_session = ChatSession.query.filter_by(
+        id=session_id,
+        user_id=current_user.id
+    ).first()
+
+    if not chat_session:
+        return jsonify({
+            "error": "Chat session not found."
+        }), 404
+
+    conversations = Conversation.query.filter_by(
+        chat_session_id=chat_session.id,
+        user_id=current_user.id
+    ).order_by(
+        Conversation.created_at.asc()
+    ).all()
+
+    messages = []
+
+    for conversation in conversations:
+
+        messages.append({
+            "user_message": conversation.user_message,
+            "bot_response": conversation.bot_response,
+            "created_at": conversation.created_at.strftime(
+                "%Y-%m-%d %H:%M"
+            )
+        })
+
+    return jsonify({
+        "session_id": chat_session.id,
+        "title": chat_session.title,
+        "messages": messages
+    })
+
+
+# ==========================================
 # SETTINGS PAGE
 # ==========================================
 
@@ -268,15 +347,32 @@ def settings():
             integration = Integration(
                 user_id=current_user.id
             )
+            db.session.add(integration)
+
+        configured_phone_number_id = os.getenv(
+            "WHATSAPP_PHONE_NUMBER_ID"
+        )
+
+        if (
+            not integration.whatsapp_phone_number_id
+            and configured_phone_number_id
+        ):
+            integration.whatsapp_phone_number_id = (
+                configured_phone_number_id
+            )
+
 
             db.session.add(integration)
 
         integration.whatsapp_number = whatsapp_number
-        integration.whatsapp_api_key = whatsapp_api_key
+        if whatsapp_api_key:
+            integration.whatsapp_api_key = whatsapp_api_key
+        
         integration.store_type = store_type
         integration.store_url = store_url
-        integration.store_api_key = store_api_key
-
+        
+        if store_api_key:
+            integration.store_api_key = store_api_key
         db.session.commit()
 
         return redirect(url_for("settings"))
@@ -302,6 +398,7 @@ def premium():
 # AI CHAT API
 # ==========================================
 
+
 @app.route("/send", methods=["POST"])
 @login_required
 def send_message():
@@ -309,17 +406,13 @@ def send_message():
     data = request.get_json(silent=True)
 
     if not data:
-
         return jsonify({
             "error": "Invalid request."
         }), 400
 
-    user_message = data.get(
-        "message", ""
-    )
+    user_message = data.get("message", "")
 
     if not isinstance(user_message, str):
-
         return jsonify({
             "error": "Message must be text."
         }), 400
@@ -327,23 +420,43 @@ def send_message():
     user_message = user_message.strip()
 
     if not user_message:
-
         return jsonify({
             "error": "Message cannot be empty."
         }), 400
 
     if len(user_message) > 10000:
-
         return jsonify({
             "error": "Message is too long."
         }), 400
+
+    # Check requested chat session
+    chat_session_id = data.get("chat_session_id")
+    chat_session = None
+
+    if chat_session_id is not None:
+
+        try:
+            chat_session_id = int(chat_session_id)
+        except (TypeError, ValueError):
+            return jsonify({
+                "error": "Invalid chat session."
+            }), 400
+
+        chat_session = ChatSession.query.filter_by(
+            id=chat_session_id,
+            user_id=current_user.id
+        ).first()
+
+        if not chat_session:
+            return jsonify({
+                "error": "Chat session not found."
+            }), 404
 
     # Reset daily message count if needed
     reset_daily_messages(current_user)
 
     # Check daily limit
     if current_user.message_count >= DAILY_LIMIT:
-
         return jsonify({
             "limit_reached": True,
             "message": "You have reached your daily limit of 100 messages."
@@ -365,11 +478,28 @@ def send_message():
             "error": "Unable to generate an AI response. Please try again."
         }), 502
 
-    # Save conversation
+    # Save conversation and chat session
     try:
+
+        # Create a new session if one was not supplied
+        if not chat_session:
+
+            chat_session = ChatSession(
+                user_id=current_user.id,
+                title=user_message[:200]
+            )
+
+            db.session.add(chat_session)
+            db.session.flush()
+
+        # Set title if this is an older unnamed session
+        elif chat_session.title == "New Chat":
+
+            chat_session.title = user_message[:200]
 
         conversation = Conversation(
             user_id=current_user.id,
+            chat_session_id=chat_session.id,
             user_message=user_message,
             bot_response=ai_reply
         )
@@ -394,6 +524,10 @@ def send_message():
 
         "reply": ai_reply,
 
+        "chat_session_id": chat_session.id,
+
+        "chat_title": chat_session.title,
+
         "message_count": current_user.message_count,
 
         "remaining_messages": DAILY_LIMIT - current_user.message_count,
@@ -402,20 +536,33 @@ def send_message():
 
     })
 
-
-
 # ==========================================
 # WHATSAPP MESSAGE SENDER
 # ==========================================
 
-def send_whatsapp_message(recipient, message):
+
+def send_whatsapp_message(
+    recipient,
+    message,
+    phone_number_id=None
+):
 
     access_token = os.getenv("WHATSAPP_ACCESS_TOKEN")
-    phone_number_id = os.getenv("WHATSAPP_PHONE_NUMBER_ID")
-    api_version = os.getenv("WHATSAPP_API_VERSION", "v27.0")
+
+    phone_number_id = (
+        phone_number_id
+        or os.getenv("WHATSAPP_PHONE_NUMBER_ID")
+    )
+
+    api_version = os.getenv(
+        "WHATSAPP_API_VERSION",
+        "v27.0"
+    )
 
     if not access_token or not phone_number_id:
-        raise RuntimeError("WhatsApp credentials are missing.")
+        raise RuntimeError(
+            "WhatsApp credentials are missing."
+        )
 
     url = (
         f"https://graph.facebook.com/"
@@ -547,6 +694,26 @@ def whatsapp_webhook():
 
                 value = change.get("value", {})
 
+                metadata = value.get("metadata", {})
+
+                incoming_phone_number_id = metadata.get(
+                    "phone_number_id"
+                )
+
+
+                if not incoming_phone_number_id:
+                    continue
+
+                integration = Integration.query.filter_by(
+                    whatsapp_phone_number_id=incoming_phone_number_id
+                ).first()
+
+                if not integration:
+                    app.logger.warning(
+                        "No registered integration found for incoming WhatsApp number."
+                    )
+                    continue
+
                 messages = value.get("messages", [])
 
                 for incoming in messages:
@@ -600,19 +767,24 @@ def whatsapp_webhook():
                         )
 
                     # Save WhatsApp conversation
+
                     conversation = WhatsAppConversation(
+                        owner_user_id=integration.user_id,
                         sender_id=sender,
                         user_message=user_message,
                         bot_response=ai_reply
                     )
 
+
                     db.session.add(conversation)
                     db.session.commit()
 
                     # Send AI response to WhatsApp
+                    
                     send_whatsapp_message(
                         sender,
-                        ai_reply
+                        ai_reply,
+                        phone_number_id=incoming_phone_number_id
                     )
 
         return "EVENT_RECEIVED", 200
